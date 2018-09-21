@@ -1,0 +1,70 @@
+---
+title: "Capacity Assesment"
+author: "gabriel_mutua"
+date: "September 21, 2018"
+output: html_document
+---
+
+## 1 Introduction
+The MLIS Department undertook capacity assessment from 15th - 20th  of August 2018, in relation to Monitoring, Evaluation, Research and Learning. The purpose of the assessment was to identify the capacity gaps and develop a capacity building plan for MLIS staff.
+
+***
+### 2 Results
+The analysis below was done on 43 responses from MLIS team members. 
+
+***
+
+```{r include=FALSE}
+#load libraries
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+library(plotly)
+
+#Read data into R
+cleaned_data <- read.csv("~/work/cleaned_capacity.csv", header = TRUE, strip.white=TRUE)
+```
+
+
+### 3 Deparments included in the survey
+
+Analysis on the departments which took part in the survey.
+
+```{r pressure, echo = FALSE}
+
+by_department = group_by(cleaned_data, department)
+unique_dpt = summarise(by_department, count = n())
+
+#create a bar plot
+p <- ggplot(unique_dpt, aes(department, count, fill = department)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = count), fontface = "bold") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(
+      colour = "#7F7F7F",
+      size = 12,
+      face = "bold"
+    ),
+    axis.title.y = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    legend.title = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    legend.text = element_text(
+      colour = "#7F7F7F",
+      size = 9,
+      face = "bold"
+    )
+  )
+
+ggplotly(p) %>% config(displayModeBar = T)
+
+```

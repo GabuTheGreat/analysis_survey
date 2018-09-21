@@ -4,7 +4,7 @@ library(dplyr)
 library(reshape2)
 
 #Read data into R
-data_1 <- read.csv("~/work/Survey_1.csv", header = TRUE, strip.white=TRUE)
+data_1 <- read.csv("~/work/capacity.csv", header = TRUE, strip.white=TRUE)
 
 #get all row with yes.
 
@@ -180,10 +180,9 @@ collection_names = c('D_var1','D_var2','D_var3','D_var4','D_var5','D_var6','D_va
 cleaned_data = cleaned_data %>% rename_at(vars(starts_with('D..Data.Collection.')), ~ collection_names)
 
 #Renaming Data_mgt questions
-data_mgt_names = c('D_var1','D_var2','D_var3','D_var4','D_var5','D_var6','D_var7','D_var8','D_var9','D_var10','D_var11','D_var12','D_var13','D_var14','D_var15','D_var16','D_var17','D_var18')
+data_mgt_names = c('Qq_var1','Qq_var2','Qq_var3','Qq_var4','Qq_var5','Qq_var6','Qq_var7','Qq_var8','Qq_var9','Qq_var10','Qq_var11','Qq_var12','Qq_var13','Qq_var14','Qq_var15','Qq_var16','Qq_var17','Qq_var18')
 cleaned_data = cleaned_data %>% rename_at(vars(starts_with('E..Qualitative')), ~ data_mgt_names)
 
-#information system
-#Renaming Data_mgt questions
-info_names = c('F_var1','F_var2','F_var3','F_var4','F_var5','F_var6','F_var7','F_var8','F_var9','F_var10','F_var11','F_var12','F_var13')
-cleaned_data = cleaned_data %>% rename_at(vars(starts_with('F..Information.Systems..IS...')), ~ info_names)
+
+#Analysis on data
+avarage
