@@ -6,10 +6,12 @@ output: html_document
 ---
 
 ## **Introduction**
+
 The MLIS Department undertook capacity assessment from 15th - 20th  of August 2018, in relation to Monitoring, Evaluation, Research and Learning. The purpose of the assessment was to identify the capacity gaps and develop a capacity building plan for MLIS staff.
 
 ***
 ### **1) Results**
+
 The analysis below was done on 43 responses from MLIS team members. 
 
 ***
@@ -22,7 +24,7 @@ library(reshape2)
 library(plotly)
 
 #Read data into R
-cleaned_data <- read.csv("~/work/cleaned_capacity.csv", header = TRUE, strip.white=TRUE)
+cleaned_data <- read.csv("~/Documents/analysis_survey/cleaned_capacity.csv", header = TRUE, strip.white=TRUE)
 ```
 
 
@@ -123,7 +125,9 @@ ggplotly(p) %>% config(displayModeBar = F) %>% layout(legend = list(x = 1, y = 1
 
 ***
 ### **1.3) Current Position Held**
+
 We asked each partcipant to input his/her current position. The results are tabulated below. The table shows all unique responses from the participants of the survey. 
+
 ```{r echo = FALSE}
 library(knitr)
 #Analysis of unique positions reported back in the survey.
@@ -153,6 +157,7 @@ kable(unique_position, caption = "All unique positions reported during the surve
 
 ***
 ### **1.4) Experience**
+
 We asked participants experience in months both in the current possition and in the industry.  The median for expereinece in the current position was **27 months**, while the median for the experience in the industry was **49 months**.  The box plots below shows the distibutional characteristics of experience among MLIS team members.
 
 ```{r echo=FALSE}
@@ -207,5 +212,137 @@ p = ggplot(data = bxplt_data, aes(group, value, fill = group)) +
 ggplotly(p) %>% config(displayModeBar = F) %>% layout(legend = list(x = 1, y = 1))
 
 ```
+
+***
+### **1.5) Highest Level of Education Obtained**
+
+The participants were asked to list their highest level of education obtained. The resulst are tabulated below.
+
+```{r echo=FALSE}
+cleaned_data$level_education <- tolower(cleaned_data$level_education)
+cleaned_data$level_education <-
+  trim.trailing(cleaned_data$level_education)
+cleaned_data$level_education <- firstup(cleaned_data$level_education)
+by_edlevel = group_by(cleaned_data, level_education)
+unique_edlevel = summarise(by_edlevel, count = n())
+unique_edlevel = arrange(unique_edlevel, desc(count))
+kable(unique_edlevel , caption = "All highest level of education reported in the survey")
+```
+
+***
+### **1.6) Training on the Current Area of Work**
+
+The participants were asked if they have received any training in the current area of training. Fifty eight **(58) percent** of responded said they have recived training.
+
+```{r echo=FALSE}
+training_done <- group_by(cleaned_data, training)
+training_done <- summarise(training_done, count = n()) %>% mutate(Percantage = paste(round((count/sum(count)*100),0),"%", sep = ""))
+
+training_done = arrange(training_done, desc(count))
+kable(training_done, caption = "Have you received training in the current area of work?")
+```
+
+Seventeen **(17)** FMT members indicated that they had received further training, while no member of C&P who indicated he/she had recieved a further training. See the plot below.
+
+```{r echo=FALSE, message=FALSE}
+training_data <- cleaned_data[, c('training', 'unit', 'department')]
+grouped_training = group_by(training_data, unit)
+#unit per training
+unit_training <-
+  summarise(grouped_training,
+            Yes = sum(training == 'Yes'),
+            No = sum(training == 'No'))
+unit_renamed <- c("C&P", "DL", "FMT", "IS", "PDA", "PDM")
+unit_training$unit <- unit_renamed
+
+#reshaped training
+shp_training <- melt(unit_training)
+shp_training <- filter(shp_training, value > 0)
+
+#plotting unit against
+#create a bar plot
+p = ggplot(shp_training, aes(unit, value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(
+    aes(label = value),
+    fontface = "bold",
+    position = position_dodge(width = 1),
+    vjust = 0.5
+  ) +
+  theme(
+    axis.text.x = element_text(
+      colour = "#7F7F7F",
+      size = 12,
+      face = "bold"
+    ),
+    axis.title.x = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    axis.text.y = element_text(
+      colour = "#7F7F7F",
+      size = 12,
+      face = "bold"
+    ),
+    axis.title.y = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    legend.title = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    legend.text = element_text(
+      colour = "#7F7F7F",
+      size = 9,
+      face = "bold"
+    )
+  )
+
+ggplotly(p) %>% config(displayModeBar = F) %>% layout(legend = list(x = 1, y = 1))
+
+```
+
+The 22 MLIS team mebers who indicated that they have received further training listed the following trainings tabulated below.
+
+```{r echo=FALSE}
+cleaned_data$training_done <- tolower(cleaned_data$training_done)
+cleaned_data$training_done <- firstup(cleaned_data$training_done)
+table_trainingby <- group_by(cleaned_data, training_done)
+table_training <- table_trainingby %>% summarise(count = n()) %>% filter(training_done != "")
+
+table_training = arrange(table_training, desc(count))
+kable(table_training, caption = "Training done on current area of work")
+
+```
+
+***
+### **1.7) Skills in Research, Monitoring Evaluation and Learning**
+
+MLIS members were asked to rate their skills on research, monitoring and learning in relation to their current position. The results showed that **66 percent** of MLIS members were very good at this area, while **24 percent** were avarage. See the table below.
+
+```{r echo=FALSE} 
+knowledge_by <- group_by(cleaned_data, kwld_rsch)
+table_kwld <- summarise(knowledge_by, count = n()) %>% mutate(Percantage = paste(round((count/sum(count)*100),0),"%", sep = ""))
+
+table_kwld  = arrange(table_kwld , desc(count))
+kable(table_kwld , caption = "Competency in Research and M&E")
+
+```
+
+The survey also included a question asking if the MLIS team members required further any training in research, monitoring evaluation and learning. Ninety two **(92) percent** indicated that they are interested in  getting training.
+
+```{r echo=FALSE}
+nd_trby <- group_by(cleaned_data, need_training)
+table_ndtr <- summarise(nd_trby, count = n()) %>% mutate(Percantage = paste(round((count/sum(count)*100),0),"%", sep = ""))
+
+table_ndtr  = arrange(table_ndtr , desc(count))
+kable(table_ndtr , caption = "Percentage of People in need of training")
+```
+
+
 
 ***

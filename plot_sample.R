@@ -4,15 +4,29 @@ library(dplyr)
 library(reshape2)
 library(plotly)
 
-cleaned_data <- read.csv("~/work/cleaned_capacity.csv", header = TRUE, strip.white=TRUE)#count Unique departments
-by_department = group_by(cleaned_data, department)
-unique_dpt = summarise(by_department, count = n())
+training_data <- cleaned_data[, c('training', 'unit', 'department')]
+grouped_training = group_by(training_data, unit)
+#unit per training
+unit_training <-
+  summarise(grouped_training,
+            Yes = sum(training == 'Yes'),
+            No = sum(training == 'No'))
+unit_renamed <- c("C&P", "DL", "FMT", "IS", "PDA", "PDM")
+unit_training$unit <- unit_renamed
 
-p = ggplot(data = bxplt_data, aes(group, value, fill = group)) +
-  geom_boxplot(
-    outlier.colour = "red",
-    outlier.shape = 8,
-    outlier.size = 4
+#reshaped training
+shp_training <- melt(unit_training)
+shp_training <- filter(shp_training, value > 0)
+
+#plotting unit against
+#create a bar plot
+p = ggplot(shp_training, aes(unit, value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(
+    aes(label = value),
+    fontface = "bold",
+    position = position_dodge(width = 1),
+    vjust = 0.5
   ) +
   theme(
     axis.text.x = element_text(
@@ -46,4 +60,5 @@ p = ggplot(data = bxplt_data, aes(group, value, fill = group)) +
       face = "bold"
     )
   )
+
 ggplotly(p) %>% config(displayModeBar = F) %>% layout(legend = list(x = 1, y = 1))
