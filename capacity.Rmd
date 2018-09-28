@@ -1,15 +1,15 @@
 ---
-title: "Capacity Assesment"
+title: "Capacity Assesment Survey Results"
 author: "gabriel_mutua"
 date: "September 21, 2018"
 output: html_document
 ---
 
-## 1 Introduction
+## **Introduction**
 The MLIS Department undertook capacity assessment from 15th - 20th  of August 2018, in relation to Monitoring, Evaluation, Research and Learning. The purpose of the assessment was to identify the capacity gaps and develop a capacity building plan for MLIS staff.
 
 ***
-### 2 Results
+### **1) Results**
 The analysis below was done on 43 responses from MLIS team members. 
 
 ***
@@ -26,17 +26,15 @@ cleaned_data <- read.csv("~/work/cleaned_capacity.csv", header = TRUE, strip.whi
 ```
 
 
-### 3 Deparments included in the survey
+### **1.1) MLIS Deparments** 
 
-Analysis on the departments which took part in the survey.
+we asked participants which deparment they belonged, **23** participants sayed the belonged to the field monitoring departement. **Eleven (11)** participants belonged to design,data processing and analysis department and 4 belonged to data learnig department. **See the plot below**.
 
 ```{r pressure, echo = FALSE}
-
 by_department = group_by(cleaned_data, department)
 unique_dpt = summarise(by_department, count = n())
 
-#create a bar plot
-p <- ggplot(unique_dpt, aes(department, count, fill = department)) +
+p = ggplot(unique_dpt, aes(department, count, fill = department)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = count), fontface = "bold") +
   theme(
@@ -65,6 +63,149 @@ p <- ggplot(unique_dpt, aes(department, count, fill = department)) +
     )
   )
 
-ggplotly(p) %>% config(displayModeBar = T)
+ggplotly(p) %>% config(displayModeBar = F) %>% layout(legend = list(x = 0, y = 1))
 
 ```
+
+***
+### **1.2) MLIS Units**
+
+MLIS has 6 units, which are:
+
+1. Carbon and partnership **(C&P)**.
+2. Data learning **(DL)**.
+3. Field Monitoring Teams **(FMT)**.
+4. Information systems **(IS)**.
+5. Program data analysis **(DPA)**.
+6. Program data management **(PDM)**.
+
+According to the results obtained, FMT had the largest number of participants **24**, with C&P, DL and IS having **two** members each. **See the plot below**.
+
+```{r echo = FALSE}
+####
+#count Unique unit
+by_unit = group_by(cleaned_data, unit)
+unique_unit = summarise(by_unit, count = n())
+
+#create a bar plot
+p = ggplot(unique_unit, aes(unit, count, fill = unit)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = count), fontface = "bold") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(
+      colour = "#7F7F7F",
+      size = 12,
+      face = "bold"
+    ),
+    axis.title.y = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    legend.title = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    legend.text = element_text(
+      colour = "#7F7F7F",
+      size = 9,
+      face = "bold"
+    )
+  )
+
+ggplotly(p) %>% config(displayModeBar = F) %>% layout(legend = list(x = 1, y = 1))
+
+```
+
+***
+### **1.3) Current Position Held**
+We asked each partcipant to input his/her current position. The results are tabulated below. The table shows all unique responses from the participants of the survey. 
+```{r echo = FALSE}
+library(knitr)
+#Analysis of unique positions reported back in the survey.
+cleaned_data$position <- tolower(cleaned_data$position)
+
+#Returns string w/o trailing whitespace
+trim.trailing <- function (x)
+  sub("\\s+$", "", x)
+cleaned_data$position <- trim.trailing(cleaned_data$position)
+
+#Capitilize the first word only
+firstup <- function(x) {
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
+}
+cleaned_data$position <- firstup(cleaned_data$position)
+
+by_position = group_by(cleaned_data, position)
+unique_position = summarise(by_position, count = n())
+
+unique_position = arrange(unique_position, desc(count))
+
+#Display the results as a table.
+kable(unique_position, caption = "All unique positions reported during the survey")
+
+```
+
+***
+### **1.4) Experience**
+We asked participants experience in months both in the current possition and in the industry.  The median for expereinece in the current position was **27 months**, while the median for the experience in the industry was **49 months**.  The box plots below shows the distibutional characteristics of experience among MLIS team members.
+
+```{r echo=FALSE}
+time_current <- cleaned_data$time_current
+time_industry <- cleaned_data$time_industry
+
+bxplt_data_1 <- data.frame(group = "current", value =  time_current)
+bxplt_data_2 <-
+  data.frame(group = "industry", value =  time_industry)
+bxplt_data <- rbind(bxplt_data_1, bxplt_data_2)
+
+#develop a box plot for distribution of experience
+p = ggplot(data = bxplt_data, aes(group, value, fill = group)) +
+  geom_boxplot(
+    outlier.colour = "red",
+    outlier.shape = 8,
+    outlier.size = 4
+  ) +
+  theme(
+    axis.text.x = element_text(
+      colour = "#7F7F7F",
+      size = 12,
+      face = "bold"
+    ),
+    axis.title.x = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    axis.text.y = element_text(
+      colour = "#7F7F7F",
+      size = 12,
+      face = "bold"
+    ),
+    axis.title.y = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    legend.title = element_text(
+      colour = "#FE6F88",
+      size = 12,
+      face = "bold"
+    ),
+    legend.text = element_text(
+      colour = "#7F7F7F",
+      size = 9,
+      face = "bold"
+    )
+  )
+
+ggplotly(p) %>% config(displayModeBar = F) %>% layout(legend = list(x = 1, y = 1))
+
+```
+
+***

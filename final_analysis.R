@@ -121,6 +121,11 @@ ggplot(shp_training, aes(unit, value, fill = variable))+
 
 
 ## Training
+#Analysis of people who have done training
+training_done <- group_by(cleaned_data, training)
+training_done <- summarise(training_done, count = n()) %>% mutate(Percantage = paste(round((count/sum(count)*100),0),"%", sep = ""))
+View(training_done)
+
 #Tabling training done per departement
 #Remember to choose training per unit.
 cleaned_data$training_done <- tolower(cleaned_data$training_done)
