@@ -22,9 +22,10 @@ library(ggplot2)
 library(dplyr)
 library(reshape2)
 library(plotly)
+library(kableExtra)
 
 #Read data into R
-cleaned_data <- read.csv("~/Documents/analysis_survey/cleaned_capacity.csv", header = TRUE, strip.white=TRUE)
+cleaned_data <- read.csv("~/analysis_survey/cleaned_capacity.csv", header = TRUE, strip.white=TRUE)
 ```
 
 
@@ -151,7 +152,7 @@ unique_position = summarise(by_position, count = n())
 unique_position = arrange(unique_position, desc(count))
 
 #Display the results as a table.
-kable(unique_position, caption = "All unique positions reported during the survey")
+kable(unique_position, caption = "All unique positions reported during the survey") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
 
@@ -226,7 +227,7 @@ cleaned_data$level_education <- firstup(cleaned_data$level_education)
 by_edlevel = group_by(cleaned_data, level_education)
 unique_edlevel = summarise(by_edlevel, count = n())
 unique_edlevel = arrange(unique_edlevel, desc(count))
-kable(unique_edlevel , caption = "All highest level of education reported in the survey")
+kable(unique_edlevel , caption = "All highest level of education reported in the survey") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ***
@@ -239,7 +240,7 @@ training_done <- group_by(cleaned_data, training)
 training_done <- summarise(training_done, count = n()) %>% mutate(Percantage = paste(round((count/sum(count)*100),0),"%", sep = ""))
 
 training_done = arrange(training_done, desc(count))
-kable(training_done, caption = "Have you received training in the current area of work?")
+kable(training_done, caption = "Have you received training in the current area of work?") %>% kable_styling(bootstrap_options = "striped", full_width = F)
 ```
 
 Seventeen **(17)** FMT members indicated that they had received further training, while no member of C&P who indicated he/she had recieved a further training. See the plot below.
@@ -315,7 +316,7 @@ table_trainingby <- group_by(cleaned_data, training_done)
 table_training <- table_trainingby %>% summarise(count = n()) %>% filter(training_done != "")
 
 table_training = arrange(table_training, desc(count))
-kable(table_training, caption = "Training done on current area of work")
+kable(table_training, caption = "Training done on current area of work") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
 
@@ -329,7 +330,7 @@ knowledge_by <- group_by(cleaned_data, kwld_rsch)
 table_kwld <- summarise(knowledge_by, count = n()) %>% mutate(Percantage = paste(round((count/sum(count)*100),0),"%", sep = ""))
 
 table_kwld  = arrange(table_kwld , desc(count))
-kable(table_kwld , caption = "Competency in Research and M&E")
+kable(table_kwld , caption = "Competency in Research and M&E") %>%  kable_styling(bootstrap_options = "striped", full_width = F)
 
 ```
 
@@ -340,9 +341,374 @@ nd_trby <- group_by(cleaned_data, need_training)
 table_ndtr <- summarise(nd_trby, count = n()) %>% mutate(Percantage = paste(round((count/sum(count)*100),0),"%", sep = ""))
 
 table_ndtr  = arrange(table_ndtr , desc(count))
-kable(table_ndtr , caption = "Percentage of People in need of training")
+kable(table_ndtr , caption = "Percentage of People in need of training") %>%  kable_styling(bootstrap_options = "striped", full_width = F)
 ```
 
+***
+### **1.8) Rating MLIS Team members Skills in Research.**
+
+MLIS team members were asked to rate there understanding and ability to undertake several research tasks (Listed below) on a scale of 1 to 5, with **“1”** meaning Not knowledgeable at all, **“2”** Less knowledgeable, **“3”** A little more Knowledgeable, **“4”** “Sufficient Knowledge, and **“5”** Excellent knowledge.
+
+The research tasks which MLIS team members were asked to rate their knowledge in are listed below. Note they are assigned code which is used in analysis in the rest of this section.
+
+```{r echo=FALSE}
+research <- read.csv("~/analysis_survey/Research_variables.csv")
+
+kable(research, caption = "All research tasks, and their codes") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+The table below shows avarage scores of each MLIS unit in reseach. The avarage score of all MLIS units was 3. Information System unit had the highest score of 4, in research. Developing Operational Research study protocols had the poor rate of all research tasks included in the survey.
+
+```{r echo=FALSE}
+by_unit = group_by(cleaned_data, unit)
+avarage_research = summarise(by_unit,
+                    R_var1 = round(mean(R_var1, na.rm = TRUE), 0),
+                    R_var2 = round(mean(R_var2, na.rm = TRUE), 0),
+                    R_var3 = round(mean(R_var3, na.rm = TRUE), 0),
+                    R_var4 = round(mean(R_var4, na.rm = TRUE), 0),
+                    R_var5 = round(mean(R_var5, na.rm = TRUE), 0),
+                    R_var6 = round(mean(R_var6, na.rm = TRUE), 0),
+                    R_var7 = round(mean(R_var7, na.rm = TRUE), 0),
+                    R_var8 = round(mean(R_var8, na.rm = TRUE), 0),
+                    R_var9 = round(mean(R_var9, na.rm = TRUE), 0),
+                    R_var10 = round(mean(R_var10, na.rm = TRUE), 0),
+                    R_var11 = round(mean(R_var11, na.rm = TRUE), 0),
+                    R_var12 = round(mean(R_var12, na.rm = TRUE), 0),
+                    R_var13 = round(mean(R_var13, na.rm = TRUE), 0),
+                    R_var14 = round(mean(R_var14, na.rm = TRUE), 0),
+                    R_var15 = round(mean(R_var15, na.rm = TRUE), 0),
+                    Count = n())
+
+
+avarage_research <- avarage_research %>% 
+  rowwise() %>% 
+  mutate(Mean=round(mean(c(R_var1,R_var2,R_var3,R_var4,R_var5,R_var6,R_var7,R_var8,R_var9,R_var10,R_var11,R_var12,R_var13,R_var14,R_var15)),0))
+
+attach(avarage_research)
+avarage_research = avarage_research %>%
+  add_row(
+    unit = "Mean",
+    R_var1 = round(mean(R_var1), 0),
+    R_var2 = round(mean(R_var2), 0),
+    R_var3 = round(mean(R_var3), 0),
+    R_var4 = round(mean(R_var4), 0),
+    R_var5 = round(mean(R_var5), 0),
+    R_var6 = round(mean(R_var6), 0),
+    R_var7 = round(mean(R_var7), 0),
+    R_var8 = round(mean(R_var8), 0),
+    R_var9 = round(mean(R_var9), 0),
+    R_var10 = round(mean(R_var10), 0),
+    R_var11 = round(mean(R_var11), 0),
+    R_var12 = round(mean(R_var12), 0),
+    R_var13 = round(mean(R_var13), 0),
+    R_var14 = round(mean(R_var14), 0),
+    R_var15 = round(mean(R_var15), 0),
+    Count = round(mean(Count), 0),
+    Mean = round(mean(Mean), 0)
+  )
+
+kable(avarage_research, caption = "Research skills rating, per unit") %>% kable_styling(bootstrap_options = "striped", font_size = 11) 
+```
+
+***
+### **1.9) Rating MLIS Team members Skills in Monitoring and Evaluation.**
+MLIS team members were asked to rate there understanding and ability to undertake several monitoring and evalution tasks (Listed below) on a scale of 1 to 5, with **“1”** meaning Not knowledgeable at all, **“2”** Less knowledgeable, **“3”** A little more Knowledgeable, **“4”** “Sufficient Knowledge, and **“5”** Excellent knowledge.
+
+The monitoring and evalution tasks which MLIS team members were asked to rate their knowledge in  are listed below. Note they are assigned code which is used in analysis in the rest of this section.
+
+```{r echo=FALSE, message=FALSE}
+mne <- read.csv("~/analysis_survey/mne_variables.csv")
+
+kable(mne, caption = "All Monitoring and Evalution tasks, and their codes") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+The table below shows that, the avarage score of MLIS under monitoring and evaluation was 2 (Less knowledgeable ). 
+
+```{r echo=FALSE, message=FALSE}
+avarage_mne = summarise(by_unit,
+                        M_var1 = round(mean(M_var1, na.rm = TRUE), 0),
+                        M_var2 = round(mean(M_var2, na.rm = TRUE), 0),
+                        M_var3 = round(mean(M_var3, na.rm = TRUE), 0),
+                        M_var4 = round(mean(M_var4, na.rm = TRUE), 0),
+                        M_var5 = round(mean(M_var5, na.rm = TRUE), 0),
+                        M_var6 = round(mean(M_var6, na.rm = TRUE), 0),
+                        M_var7 = round(mean(M_var7, na.rm = TRUE), 0),
+                        M_var8 = round(mean(M_var8, na.rm = TRUE), 0),
+                        M_var9 = round(mean(M_var9, na.rm = TRUE), 0),
+                        M_var10 = round(mean(M_var10, na.rm = TRUE), 0),
+                        M_var11 = round(mean(M_var11, na.rm = TRUE), 0),
+                        Count = n())
+
+avarage_mne <- avarage_mne %>% 
+  rowwise() %>% 
+  mutate(Mean=round(mean(c(M_var1,M_var2,M_var3,M_var4,M_var5,M_var6,M_var7,M_var8,M_var9,M_var10,M_var11)),0))
+
+attach(avarage_mne)
+avarage_mne = avarage_mne %>%
+  add_row(
+    unit = "Mean",
+    M_var1 = round(mean(M_var1), 0),
+    M_var2 = round(mean(M_var2), 0),
+    M_var3 = round(mean(M_var3), 0),
+    M_var4 = round(mean(M_var4), 0),
+    M_var5 = round(mean(M_var5), 0),
+    M_var6 = round(mean(M_var6), 0),
+    M_var7 = round(mean(M_var7), 0),
+    M_var8 = round(mean(M_var8), 0),
+    M_var9 = round(mean(M_var9), 0),
+    M_var10 = round(mean(M_var10), 0),
+    M_var11 = round(mean(M_var11), 0),
+    Count = round(mean(Count), 0),
+    Mean = round(mean(Mean), 0)
+  )
+
+kable(avarage_mne, caption = "Monitoring and Evaluation skills rating, per unit") %>% kable_styling(bootstrap_options = "striped", font_size = 11) 
+```
+
+***
+### **2.0) Rating MLIS Team members Skills in Learning.**
+MLIS team members were asked to rate there understanding and ability to undertake several learning tasks (Listed below) on a scale of 1 to 5, with **“1”** meaning Not knowledgeable at all, **“2”** Less knowledgeable, **“3”** A little more Knowledgeable, **“4”** “Sufficient Knowledge, and **“5”** Excellent knowledge.
+
+The learning tasks which MLIS team members were asked to rate their knowledge in are listed below. Note they are assigned code which is used in analysis in the rest of this section.
+
+```{r echo=FALSE}
+learning <- read.csv("~/analysis_survey/learning_variables.csv")
+
+kable(learning, caption = "All Learning tasks, and their codes") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+The avarage score of MLIS in this section was 3 (A little more Knowledgeable). Data learning scored highgly in this section with a score of 4.
+
+```{r echo=FALSE,message=FALSE}
+## Analysis on learning question.
+avarage_learning = summarise(by_unit,
+                             L_var1 = round(mean(L_var1, na.rm = TRUE), 0),
+                             L_var2 = round(mean(L_var2, na.rm = TRUE), 0),
+                             L_var3 = round(mean(L_var3, na.rm = TRUE), 0),
+                             L_var4 = round(mean(L_var4, na.rm = TRUE), 0),
+                             L_var5 = round(mean(L_var5, na.rm = TRUE), 0),
+                             L_var6 = round(mean(L_var6, na.rm = TRUE), 0),
+                             L_var7 = round(mean(L_var7, na.rm = TRUE), 0),
+                             L_var8 = round(mean(L_var8, na.rm = TRUE), 0),
+                             L_var9 = round(mean(L_var9, na.rm = TRUE), 0),
+                             L_var10 = round(mean(L_var10, na.rm = TRUE), 0),
+                             L_var11 = round(mean(L_var11, na.rm = TRUE), 0),
+                             L_var12 = round(mean(L_var12, na.rm = TRUE), 0),
+                             L_var13 = round(mean(L_var13, na.rm = TRUE), 0),
+                             L_var14 = round(mean(L_var14, na.rm = TRUE), 0),
+                             Count = n())
+
+avarage_learning <- avarage_learning %>% 
+  rowwise() %>% 
+  mutate(Mean=round(mean(c(L_var1,L_var2,L_var3,L_var4,L_var5,L_var6,L_var7,L_var8,L_var9,L_var10,L_var11,L_var12,L_var13,L_var14)),0))
+
+attach(avarage_learning)
+avarage_learning = avarage_learning %>%
+  add_row(
+    unit = "Mean",
+    L_var1 = round(mean(L_var1), 0),
+    L_var2 = round(mean(L_var2), 0),
+    L_var3 = round(mean(L_var3), 0),
+    L_var4 = round(mean(L_var4), 0),
+    L_var5 = round(mean(L_var5), 0),
+    L_var6 = round(mean(L_var6), 0),
+    L_var7 = round(mean(L_var7), 0),
+    L_var8 = round(mean(L_var8), 0),
+    L_var9 = round(mean(L_var9), 0),
+    L_var10 = round(mean(L_var10), 0),
+    L_var11 = round(mean(L_var11), 0),
+    L_var12 = round(mean(L_var12), 0),
+    L_var13 = round(mean(L_var13), 0),
+    L_var14 = round(mean(L_var14), 0),
+    Count = round(mean(Count), 0),
+    Mean = round(mean(Mean), 0)
+  )
+kable(avarage_learning, caption = "Learning skills rating, per unit") %>% kable_styling(bootstrap_options = "striped", font_size = 11) 
+```
+
+***
+### **2.1) Rating MLIS Team members Skills in Data Collection.**
+MLIS team members were asked to rate there understanding and ability to undertake several data collection tasks (Listed below) on a scale of 1 to 5, with **“1”** meaning Not knowledgeable at all, **“2”** Less knowledgeable, **“3”** A little more Knowledgeable, **“4”** “Sufficient Knowledge, and **“5”** Excellent knowledge.
+
+The data collection tasks which MLIS team members were asked to rate their knowledge in are listed below. Note they are assigned code which is used in analysis in the rest of this section.
+
+```{r echo=FALSE}
+data_col <- read.csv("~/analysis_survey/dc_variables.csv")
+
+kable(data_col, caption = "All Data Collection tasks, and their codes") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+```
+
+The avarage score of MLIS in this section was 4 (Sufficient Knowledge). Data learning had the lowest score of 3 in this section. All other units scored 4. Planning and conducting quality assurance checks (D_Var5), had the lowest score of 3 among all other listed tasks.
+
+```{r echo=FALSE, message=FALSE}
+avarage_dcollection = summarise(by_unit,
+                                D_var1 = round(mean(D_var1, na.rm = TRUE), 0),
+                                D_var2 = round(mean(D_var2, na.rm = TRUE), 0),
+                                D_var3 = round(mean(D_var3, na.rm = TRUE), 0),
+                                D_var4 = round(mean(D_var4, na.rm = TRUE), 0),
+                                D_var5 = round(mean(D_var5, na.rm = TRUE), 0),
+                                D_var6 = round(mean(D_var6, na.rm = TRUE), 0),
+                                D_var7 = round(mean(D_var7, na.rm = TRUE), 0),
+                                D_var8 = round(mean(D_var8, na.rm = TRUE), 0),
+                                D_var9 = round(mean(D_var9, na.rm = TRUE), 0),
+                                D_var10 = round(mean(D_var10, na.rm = TRUE), 0),
+                                Count = n())
+
+avarage_dcollection <- avarage_dcollection %>% 
+  rowwise() %>% 
+  mutate(Mean=round(mean(c(D_var1,D_var2,D_var3,D_var4,D_var5,D_var6,D_var7,D_var8,D_var9,D_var10)),0))
+
+attach(avarage_dcollection)
+avarage_dcollection = avarage_dcollection %>%
+  add_row(
+    unit = "Mean",
+    D_var1 = round(mean(D_var1), 0),
+    D_var2 = round(mean(D_var2), 0),
+    D_var3 = round(mean(D_var3), 0),
+    D_var4 = round(mean(D_var4), 0),
+    D_var5 = round(mean(D_var5), 0),
+    D_var6 = round(mean(D_var6), 0),
+    D_var7 = round(mean(D_var7), 0),
+    D_var8 = round(mean(D_var8), 0),
+    D_var9 = round(mean(D_var9), 0),
+    D_var10 = round(mean(D_var10), 0),
+    Count = round(mean(Count), 0),
+    Mean = round(mean(Mean), 0)
+  )
+
+kable(avarage_dcollection, caption = "Data collection skills rating, per unit") %>% kable_styling(bootstrap_options = "striped", font_size = 11) 
+```
+
+***
+### **2.2) Rating MLIS Team members Skills in Qualitative and Quantitative Data management, analysis, and visualization packages.**
+MLIS team members were asked to rate there understanding and ability to undertake several data collection tasks (Listed below) on a scale of 1 to 5, with **“1”** meaning Not knowledgeable at all, **“2”** Less knowledgeable, **“3”** A little more Knowledgeable, **“4”** “Sufficient Knowledge, and **“5”** Excellent knowledge.
+
+The data collection tasks which MLIS team members were asked to rate their knowledge in are listed below. Note they are assigned code which is used in analysis in the rest of this section.
+
+```{r echo=FALSE}
+Qq_analysis <- read.csv("~/analysis_survey/Qq_variables.csv")
+
+kable(Qq_analysis, caption = "All Qualitative and Quantitative Data management, analysis, and visualization tasks, and their codes") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+The avarage score of MLIS in this section was 3 (A little more Knowledgeable). Field Monitoring teams scored poorly in this section with a score of 2.
+
+```{r echo=FALSE, message=FALSE}
+avarage_qqAnalysis = summarise(by_unit,
+                               Qq_var1 = round(mean(Qq_var1, na.rm = TRUE), 0),
+                               Qq_var2 = round(mean(Qq_var2, na.rm = TRUE), 0),
+                               Qq_var3 = round(mean(Qq_var3, na.rm = TRUE), 0),
+                               Qq_var4 = round(mean(Qq_var4, na.rm = TRUE), 0),
+                               Qq_var5 = round(mean(Qq_var5, na.rm = TRUE), 0),
+                               Qq_var6 = round(mean(Qq_var6, na.rm = TRUE), 0),
+                               Qq_var7 = round(mean(Qq_var7, na.rm = TRUE), 0),
+                               Qq_var8 = round(mean(Qq_var8, na.rm = TRUE), 0),
+                               Qq_var9 = round(mean(Qq_var9, na.rm = TRUE), 0),
+                               Qq_var10 = round(mean(Qq_var10, na.rm = TRUE), 0),
+                               Qq_var11 = round(mean(Qq_var11, na.rm = TRUE), 0),
+                               Qq_var12 = round(mean(Qq_var12, na.rm = TRUE), 0),
+                               Qq_var13 = round(mean(Qq_var13, na.rm = TRUE), 0),
+                               Qq_var14 = round(mean(Qq_var14, na.rm = TRUE), 0),
+                               Qq_var15 = round(mean(Qq_var15, na.rm = TRUE), 0),
+                               Qq_var16 = round(mean(Qq_var16, na.rm = TRUE), 0),
+                               Qq_var17 = round(mean(Qq_var17, na.rm = TRUE), 0),
+                               Qq_var18 = round(mean(Qq_var18, na.rm = TRUE), 0),
+                               Count = n())
+
+
+avarage_qqAnalysis <- avarage_qqAnalysis %>% 
+  rowwise() %>% 
+  mutate(Mean=round(mean(c(Qq_var1,Qq_var2,Qq_var3,Qq_var4,Qq_var5,Qq_var6,Qq_var7,Qq_var8,Qq_var9,Qq_var10,Qq_var11,Qq_var12,Qq_var13,Qq_var14,Qq_var15,Qq_var16,Qq_var17,Qq_var18)),0))
+
+attach(avarage_qqAnalysis)
+avarage_qqAnalysis = avarage_qqAnalysis %>%
+  add_row(
+    unit = "Mean",
+    Qq_var1 = round(mean(Qq_var1), 0),
+    Qq_var2 = round(mean(Qq_var2), 0),
+    Qq_var3 = round(mean(Qq_var3), 0),
+    Qq_var4 = round(mean(Qq_var4), 0),
+    Qq_var5 = round(mean(Qq_var5), 0),
+    Qq_var6 = round(mean(Qq_var6), 0),
+    Qq_var7 = round(mean(Qq_var7), 0),
+    Qq_var8 = round(mean(Qq_var8), 0),
+    Qq_var9 = round(mean(Qq_var9), 0),
+    Qq_var10 = round(mean(Qq_var10), 0),
+    Qq_var11 = round(mean(Qq_var11), 0),
+    Qq_var12 = round(mean(Qq_var12), 0),
+    Qq_var13 = round(mean(Qq_var13), 0),
+    Qq_var14 = round(mean(Qq_var14), 0),
+    Qq_var15 = round(mean(Qq_var15), 0),
+    Qq_var16 = round(mean(Qq_var16), 0),
+    Qq_var17 = round(mean(Qq_var17), 0),
+    Qq_var18 = round(mean(Qq_var18), 0),
+    Count = round(mean(Count), 0),
+    Mean = round(mean(Mean), 0)
+  )
+
+kable(avarage_qqAnalysis, caption = "Qualitative and Quantitative Data management, analysis, and visualization packages skills rating, per unit") %>%  kable_styling(bootstrap_options = "striped", font_size = 11) 
+```
+
+***
+### **2.3) Rating MLIS Team members Skills in Information Systems (IS).**
+
+MLIS team members were asked to rate there understanding and ability to undertake several data collection tasks (Listed below) on a scale of 1 to 5, with **“1”** meaning Not knowledgeable at all, **“2”** Less knowledgeable, **“3”** A little more Knowledgeable, **“4”** “Sufficient Knowledge, and **“5”** Excellent knowledge.
+
+The Information Systems tasks which MLIS team members were asked to rate their knowledge in are listed below. Note they are assigned code which is used in analysis in the rest of this section.
+
+```{r echo=FALSE}
+IS_analysis <- read.csv("~/analysis_survey/IF_variables.csv")
+
+kable(IS_analysis, caption = "All Qualitative and Quantitative Data management, analysis, and visualization tasks, and their codes") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+The avarage score of MLIS in this section was 2 (Less knowledgeable). Information Systems (IS) team scored a 5 (Excellent knowledg) in this section as all other unit scored a 2. 
+
+```{r echo=FALSE,message=FALSE}
+avarage_IFSystems = summarise(by_unit,
+                              IF_var1 = round(mean(IF_var1, na.rm = TRUE), 0),
+                              IF_var2 = round(mean(IF_var2, na.rm = TRUE), 0),
+                              IF_var3 = round(mean(IF_var3, na.rm = TRUE), 0),
+                              IF_var4 = round(mean(IF_var4, na.rm = TRUE), 0),
+                              IF_var5 = round(mean(IF_var5, na.rm = TRUE), 0),
+                              IF_var6 = round(mean(IF_var6, na.rm = TRUE), 0),
+                              IF_var7 = round(mean(IF_var7, na.rm = TRUE), 0),
+                              IF_var8 = round(mean(IF_var8, na.rm = TRUE), 0),
+                              IF_var9 = round(mean(IF_var9, na.rm = TRUE), 0),
+                              IF_var10 = round(mean(IF_var10, na.rm = TRUE), 0),
+                              IF_var11 = round(mean(IF_var11, na.rm = TRUE), 0),
+                              IF_var12 = round(mean(IF_var12, na.rm = TRUE), 0),
+                              IF_var13 = round(mean(IF_var13, na.rm = TRUE), 0),
+                              Count = n())
+
+avarage_IFSystems <- avarage_IFSystems %>% 
+  rowwise() %>% 
+  mutate(Mean=round(mean(c(IF_var1,IF_var2,IF_var3,IF_var4,IF_var5,IF_var6,IF_var7,IF_var8,IF_var9,IF_var10,IF_var11,IF_var12,IF_var13)),0))
+
+attach(avarage_IFSystems)
+avarage_IFSystems = avarage_IFSystems %>%
+  add_row(
+    unit = "Mean",
+    IF_var1 = round(mean(IF_var1), 0),
+    IF_var2 = round(mean(IF_var2), 0),
+    IF_var3 = round(mean(IF_var3), 0),
+    IF_var4 = round(mean(IF_var4), 0),
+    IF_var5 = round(mean(IF_var5), 0),
+    IF_var6 = round(mean(IF_var6), 0),
+    IF_var7 = round(mean(IF_var7), 0),
+    IF_var8 = round(mean(IF_var8), 0),
+    IF_var9 = round(mean(IF_var9), 0),
+    IF_var10 = round(mean(IF_var10), 0),
+    IF_var11 = round(mean(IF_var11), 0),
+    IF_var12 = round(mean(IF_var12), 0),
+    IF_var13 = round(mean(IF_var13), 0),
+    Count = round(mean(Count), 0),
+    Mean = round(mean(Mean), 0)
+  )
+
+kable(avarage_IFSystems, caption = "Data collection skills rating, per unit") %>% kable_styling(bootstrap_options = "striped", font_size = 11) 
+```
 
 
 ***
